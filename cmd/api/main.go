@@ -1,3 +1,18 @@
+// @title ISS Model Backend API
+// @version 1.0
+// @description This is the ISS Model Backend API server
+// @termsOfService http://swagger.io/terms/
+
+// @contact.name API Support
+// @contact.url http://www.swagger.io/support
+// @contact.email support@swagger.io
+
+// @license.name Apache 2.0
+// @license.url http://www.apache.org/licenses/LICENSE-2.0.html
+
+// @host localhost:8080
+// @BasePath /
+// @schemes http https
 package main
 
 import (
@@ -9,6 +24,7 @@ import (
 	"syscall"
 	"time"
 
+	_ "iss-model-backend/docs"
 	"iss-model-backend/internal/server"
 )
 
@@ -37,7 +53,6 @@ func gracefulShutdown(apiServer *http.Server, done chan bool) {
 }
 
 func main() {
-
 	server := server.NewServer()
 
 	// Create a done channel to signal when the shutdown is complete

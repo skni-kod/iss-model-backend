@@ -3,14 +3,17 @@
 # Build the application
 all: build test
 
-build:
+build: swagger
 	@echo "Building..."
-	
-	
 	@go build -o main cmd/api/main.go
 
+# Generate Swagger documentation
+swagger:
+	@echo "Generating Swagger documentation..."
+	@swag init -g cmd/api/main.go --output docs --parseInternal
+
 # Run the application
-run:
+run: swagger
 	@go run cmd/api/main.go
 # Create DB container
 docker-run:
@@ -45,7 +48,7 @@ clean:
 	@rm -f main
 
 # Live Reload
-watch:
+watch: swagger
 	@if command -v air > /dev/null; then \
             air; \
             echo "Watching...";\
