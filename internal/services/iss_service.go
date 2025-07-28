@@ -112,8 +112,8 @@ func (s *ISSService) GetPositionsInRange(startTime, endTime int64, units string)
 	return positions, nil
 }
 
-func (s *ISSService) GetStatistics() (map[string]interface{}, error) {
-	stats := make(map[string]interface{})
+func (s *ISSService) GetStatistics() (map[string]any, error) {
+	stats := make(map[string]any)
 
 	var totalCount int64
 	if err := s.db.Model(&models.ISSPosition{}).Count(&totalCount).Error; err != nil {
@@ -139,7 +139,7 @@ func (s *ISSService) GetStatistics() (map[string]interface{}, error) {
 	}
 
 	if totalCount > 0 {
-		stats["data_coverage"] = map[string]interface{}{
+		stats["data_coverage"] = map[string]any{
 			"start": time.Unix(oldest.Timestamp, 0).Format(time.RFC3339),
 			"end":   time.Unix(latest.Timestamp, 0).Format(time.RFC3339),
 		}

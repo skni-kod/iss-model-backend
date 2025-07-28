@@ -76,7 +76,7 @@ func (h *ISSHandler) GetHistoricalPosition(w http.ResponseWriter, r *http.Reques
 
 	position, err := h.issService.GetHistoricalPosition(timestamp, units)
 	if err != nil {
-		if err.Error() == "timestamp outside retention window (4 hours back/forward)" {
+		if err.Error() == "Timestamp outside set range (4 hours back/forward)" {
 			h.sendErrorResponse(w, http.StatusBadRequest, "Timestamp out of range", err.Error())
 			return
 		}
@@ -172,7 +172,7 @@ func (h *ISSHandler) GetISSStatus(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	status := map[string]interface{}{
+	status := map[string]any{
 		"status":              "operational",
 		"current_position":    currentPos,
 		"data_retention":      "4 hours back and forward",
