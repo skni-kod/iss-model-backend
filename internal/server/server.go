@@ -11,6 +11,7 @@ import (
 
 	"iss-model-backend/internal/database"
 	"iss-model-backend/internal/handlers"
+	"iss-model-backend/internal/models"
 	"iss-model-backend/internal/services"
 )
 
@@ -31,6 +32,11 @@ func NewServer() *http.Server {
 	dbService := database.New()
 
 	gormDB := dbService.GetDB()
+
+	err := gormDB.AutoMigrate(&models.ISSPosition{})
+	if err != nil {
+		fmt.Printf("Failed to auto-migrate models: %v\n", err)
+	}
 
 	issService := services.NewISSService(gormDB)
 	issHandler := handlers.NewISSHandler(issService)
