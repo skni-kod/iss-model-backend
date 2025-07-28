@@ -75,6 +75,333 @@ const docTemplate = `{
                     }
                 }
             }
+        },
+        "/iss/current": {
+            "get": {
+                "description": "Returns the current position of the International Space Station",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "ISS"
+                ],
+                "summary": "Get Current ISS Position",
+                "parameters": [
+                    {
+                        "enum": [
+                            "kilometers",
+                            "miles"
+                        ],
+                        "type": "string",
+                        "default": "kilometers",
+                        "description": "Units (kilometers or miles)",
+                        "name": "units",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/models.ISSPosition"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/iss/historical": {
+            "post": {
+                "description": "Returns the ISS position for a timestamp provided in request body",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "ISS"
+                ],
+                "summary": "Get Historical ISS Position (POST)",
+                "parameters": [
+                    {
+                        "description": "Historical position request",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/models.HistoricalRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/models.ISSPosition"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/iss/historical/{timestamp}": {
+            "get": {
+                "description": "Returns the ISS position for a specific timestamp (within 4 hours back/forward)",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "ISS"
+                ],
+                "summary": "Get Historical ISS Position",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Unix timestamp",
+                        "name": "timestamp",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "enum": [
+                            "kilometers",
+                            "miles"
+                        ],
+                        "type": "string",
+                        "default": "kilometers",
+                        "description": "Units (kilometers or miles)",
+                        "name": "units",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/models.ISSPosition"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/iss/range": {
+            "get": {
+                "description": "Returns all ISS positions within a specified time range",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "ISS"
+                ],
+                "summary": "Get ISS Positions in Time Range",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Start timestamp (Unix)",
+                        "name": "start_time",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "type": "integer",
+                        "description": "End timestamp (Unix)",
+                        "name": "end_time",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "enum": [
+                            "kilometers",
+                            "miles"
+                        ],
+                        "type": "string",
+                        "default": "kilometers",
+                        "description": "Units (kilometers or miles)",
+                        "name": "units",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/models.ISSPosition"
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/iss/status": {
+            "get": {
+                "description": "Returns statistics about ISS tracking data and system status",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "ISS"
+                ],
+                "summary": "Get ISS Tracking Status",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "definitions": {
+        "models.ErrorResponse": {
+            "type": "object",
+            "properties": {
+                "error": {
+                    "type": "string"
+                },
+                "message": {
+                    "type": "string"
+                }
+            }
+        },
+        "models.HistoricalRequest": {
+            "type": "object",
+            "required": [
+                "timestamp"
+            ],
+            "properties": {
+                "timestamp": {
+                    "type": "integer"
+                },
+                "units": {
+                    "type": "string"
+                }
+            }
+        },
+        "models.ISSPosition": {
+            "type": "object",
+            "properties": {
+                "altitude": {
+                    "type": "number"
+                },
+                "created_at": {
+                    "type": "string"
+                },
+                "daynum": {
+                    "type": "number"
+                },
+                "footprint": {
+                    "type": "number"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "latitude": {
+                    "type": "number"
+                },
+                "longitude": {
+                    "type": "number"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "solar_lat": {
+                    "type": "number"
+                },
+                "solar_lon": {
+                    "type": "number"
+                },
+                "timestamp": {
+                    "type": "integer"
+                },
+                "units": {
+                    "type": "string"
+                },
+                "updated_at": {
+                    "type": "string"
+                },
+                "velocity": {
+                    "type": "number"
+                },
+                "visibility": {
+                    "type": "string"
+                }
+            }
         }
     }
 }`

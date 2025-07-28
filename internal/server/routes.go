@@ -1,3 +1,4 @@
+// internal/server/routes.go
 package server
 
 import (
@@ -14,18 +15,30 @@ import (
 func (s *Server) RegisterRoutes() http.Handler {
 	r := chi.NewRouter()
 	r.Use(middleware.Logger)
+	r.Use(middleware.Recoverer)
 
 	r.Use(cors.Handler(cors.Options{
 		AllowedOrigins:   []string{"https://*", "http://*"},
 		AllowedMethods:   []string{"GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"},
-		AllowedHeaders:   []string{"Accept", "Authorization", "Content-Type"},
+		AllowedHeaders:   []string{"Accept", "Authorization", "Content-Type", "X-CSRF-Token"},
 		AllowCredentials: true,
 		MaxAge:           300,
 	}))
 
 	r.Get("/", s.HelloWorldHandler)
-
 	r.Get("/health", s.healthHandler)
+
+	r.Route("/iss", func(r chi.Router) {
+		r.Get("/current", s.issHandler.GetCurrentPosition)
+
+		r.Get("/historical/{timestamp}", s.issHandler.GetHistoricalPosition)
+
+		r.Post("/historical", s.issHandler.PostHistoricalRequest)
+
+		r.Get("/range", s.issHandler.GetPositionsInRange)
+
+		r.Get("/status", s.issHandler.GetISSStatus)
+	})
 
 	r.Get("/swagger/*", httpSwagger.WrapHandler)
 
@@ -43,12 +56,17 @@ func (s *Server) RegisterRoutes() http.Handler {
 func (s *Server) HelloWorldHandler(w http.ResponseWriter, r *http.Request) {
 	resp := make(map[string]string)
 	resp["message"] = "Hello World"
+	resp["service"] = "ISS Model Backend"
+	resp["endpoints"] = "/iss/current, /iss/historical/{timestamp}, /iss/range, /iss/status"
 
 	jsonResp, err := json.Marshal(resp)
 	if err != nil {
-		log.Fatalf("error handling JSON marshal. Err: %v", err)
+		log.Printf("error handling JSON marshal. Err: %v", err)
+		http.Error(w, "Internal server error", http.StatusInternalServerError)
+		return
 	}
 
+	w.Header().Set("Content-Type", "application/json")
 	_, _ = w.Write(jsonResp)
 }
 
@@ -61,6 +79,12 @@ func (s *Server) HelloWorldHandler(w http.ResponseWriter, r *http.Request) {
 // @Success 200 {object} map[string]string
 // @Router /health [get]
 func (s *Server) healthHandler(w http.ResponseWriter, r *http.Request) {
-	jsonResp, _ := json.Marshal(s.db.Health())
+	w.Header().Set("Content-Type", "application/json")
+	jsonResp, err := json.Marshal(s.db.Health())
+	if err != nil {
+		log.Printf("error handling JSON marshal. Err: %v", err)
+		http.Error(w, "Internal server error", http.StatusInternalServerError)
+		return
+	}
 	_, _ = w.Write(jsonResp)
 }

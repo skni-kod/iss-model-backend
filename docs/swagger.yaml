@@ -1,4 +1,54 @@
 basePath: /
+definitions:
+  models.ErrorResponse:
+    properties:
+      error:
+        type: string
+      message:
+        type: string
+    type: object
+  models.HistoricalRequest:
+    properties:
+      timestamp:
+        type: integer
+      units:
+        type: string
+    required:
+    - timestamp
+    type: object
+  models.ISSPosition:
+    properties:
+      altitude:
+        type: number
+      created_at:
+        type: string
+      daynum:
+        type: number
+      footprint:
+        type: number
+      id:
+        type: integer
+      latitude:
+        type: number
+      longitude:
+        type: number
+      name:
+        type: string
+      solar_lat:
+        type: number
+      solar_lon:
+        type: number
+      timestamp:
+        type: integer
+      units:
+        type: string
+      updated_at:
+        type: string
+      velocity:
+        type: number
+      visibility:
+        type: string
+    type: object
 host: localhost:8080
 info:
   contact:
@@ -47,6 +97,174 @@ paths:
       summary: Health Check
       tags:
       - health
+  /iss/current:
+    get:
+      consumes:
+      - application/json
+      description: Returns the current position of the International Space Station
+      parameters:
+      - default: kilometers
+        description: Units (kilometers or miles)
+        enum:
+        - kilometers
+        - miles
+        in: query
+        name: units
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.ISSPosition'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+      summary: Get Current ISS Position
+      tags:
+      - ISS
+  /iss/historical:
+    post:
+      consumes:
+      - application/json
+      description: Returns the ISS position for a timestamp provided in request body
+      parameters:
+      - description: Historical position request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/models.HistoricalRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.ISSPosition'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+      summary: Get Historical ISS Position (POST)
+      tags:
+      - ISS
+  /iss/historical/{timestamp}:
+    get:
+      consumes:
+      - application/json
+      description: Returns the ISS position for a specific timestamp (within 4 hours
+        back/forward)
+      parameters:
+      - description: Unix timestamp
+        in: path
+        name: timestamp
+        required: true
+        type: integer
+      - default: kilometers
+        description: Units (kilometers or miles)
+        enum:
+        - kilometers
+        - miles
+        in: query
+        name: units
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.ISSPosition'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+      summary: Get Historical ISS Position
+      tags:
+      - ISS
+  /iss/range:
+    get:
+      consumes:
+      - application/json
+      description: Returns all ISS positions within a specified time range
+      parameters:
+      - description: Start timestamp (Unix)
+        in: query
+        name: start_time
+        required: true
+        type: integer
+      - description: End timestamp (Unix)
+        in: query
+        name: end_time
+        required: true
+        type: integer
+      - default: kilometers
+        description: Units (kilometers or miles)
+        enum:
+        - kilometers
+        - miles
+        in: query
+        name: units
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/models.ISSPosition'
+            type: array
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+      summary: Get ISS Positions in Time Range
+      tags:
+      - ISS
+  /iss/status:
+    get:
+      consumes:
+      - application/json
+      description: Returns statistics about ISS tracking data and system status
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+      summary: Get ISS Tracking Status
+      tags:
+      - ISS
 schemes:
 - http
 - https

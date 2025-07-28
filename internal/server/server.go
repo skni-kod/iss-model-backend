@@ -10,26 +10,41 @@ import (
 	_ "github.com/joho/godotenv/autoload"
 
 	"iss-model-backend/internal/database"
+	"iss-model-backend/internal/handlers"
+	"iss-model-backend/internal/services"
 )
 
 type Server struct {
 	port int
 
-	db database.Service
+	db         database.Service
+	issService *services.ISSService
+	issHandler *handlers.ISSHandler
 }
 
 func NewServer() *http.Server {
 	port, _ := strconv.Atoi(os.Getenv("PORT"))
-	NewServer := &Server{
-		port: port,
-
-		db: database.New(),
+	if port == 0 {
+		port = 8080
 	}
 
-	// Declare Server config
+	dbService := database.New()
+
+	gormDB := dbService.GetDB()
+
+	issService := services.NewISSService(gormDB)
+	issHandler := handlers.NewISSHandler(issService)
+
+	newServer := &Server{
+		port:       port,
+		db:         dbService,
+		issService: issService,
+		issHandler: issHandler,
+	}
+
 	server := &http.Server{
-		Addr:         fmt.Sprintf(":%d", NewServer.port),
-		Handler:      NewServer.RegisterRoutes(),
+		Addr:         fmt.Sprintf(":%d", newServer.port),
+		Handler:      newServer.RegisterRoutes(),
 		IdleTimeout:  time.Minute,
 		ReadTimeout:  10 * time.Second,
 		WriteTimeout: 30 * time.Second,
