@@ -21,11 +21,7 @@ jobs:
             git stash
             git checkout main
             git pull
-            
-            # Use your existing make commands
-            make docker-down
-            make docker-run
-            
-            echo "$(date): ISS Model Backend deployed successfully" >> ../deploy-log.txt
+
+            docker compose up --build -d
             
             docker system prune -a -f
