@@ -1,5 +1,19 @@
 basePath: /
 definitions:
+  models.Astronaut:
+    properties:
+      craft:
+        type: string
+      name:
+        type: string
+    type: object
+  models.AstronautWithPhoto:
+    properties:
+      imgUrl:
+        type: string
+      name:
+        type: string
+    type: object
   models.ErrorResponse:
     properties:
       error:
@@ -15,6 +29,24 @@ definitions:
         type: string
     required:
     - timestamp
+    type: object
+  models.ISSCrewResponse:
+    properties:
+      message:
+        type: string
+      people:
+        items:
+          $ref: '#/definitions/models.Astronaut'
+        type: array
+    type: object
+  models.ISSCrewWithPhotosResponse:
+    properties:
+      message:
+        type: string
+      people:
+        items:
+          $ref: '#/definitions/models.AstronautWithPhoto'
+        type: array
     type: object
   models.ISSPosition:
     properties:
@@ -97,6 +129,23 @@ paths:
       summary: Health Check
       tags:
       - health
+  /iss/crew:
+    get:
+      consumes:
+      - application/json
+      description: Return current crew aboard the ISS
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.ISSCrewResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+      summary: Get current ISS crew
+      tags:
+      - Crew
   /iss/current:
     get:
       consumes:

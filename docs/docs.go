@@ -76,6 +76,32 @@ const docTemplate = `{
                 }
             }
         },
+        "/iss/crew": {
+            "get": {
+                "description": "Return current crew aboard the ISS",
+                "consumes": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Crew"
+                ],
+                "summary": "Get current ISS crew",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/models.ISSCrewResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
         "/iss/current": {
             "get": {
                 "description": "Returns the current position of the International Space Station",
@@ -328,6 +354,28 @@ const docTemplate = `{
         }
     },
     "definitions": {
+        "models.Astronaut": {
+            "type": "object",
+            "properties": {
+                "craft": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                }
+            }
+        },
+        "models.AstronautWithPhoto": {
+            "type": "object",
+            "properties": {
+                "imgUrl": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                }
+            }
+        },
         "models.ErrorResponse": {
             "type": "object",
             "properties": {
@@ -350,6 +398,34 @@ const docTemplate = `{
                 },
                 "units": {
                     "type": "string"
+                }
+            }
+        },
+        "models.ISSCrewResponse": {
+            "type": "object",
+            "properties": {
+                "message": {
+                    "type": "string"
+                },
+                "people": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/models.Astronaut"
+                    }
+                }
+            }
+        },
+        "models.ISSCrewWithPhotosResponse": {
+            "type": "object",
+            "properties": {
+                "message": {
+                    "type": "string"
+                },
+                "people": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/models.AstronautWithPhoto"
+                    }
                 }
             }
         },

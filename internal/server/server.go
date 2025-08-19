@@ -18,9 +18,11 @@ import (
 type Server struct {
 	port int
 
-	db         database.Service
-	issService *services.ISSService
-	issHandler *handlers.ISSHandler
+	db          database.Service
+	issService  *services.ISSService
+	issHandler  *handlers.ISSHandler
+	crewService *services.CrewService
+	crewHandler *handlers.CrewHandler
 }
 
 func NewServer() *http.Server {
@@ -40,12 +42,16 @@ func NewServer() *http.Server {
 
 	issService := services.NewISSService(gormDB)
 	issHandler := handlers.NewISSHandler(issService)
+	crewService := services.NewCrewService()
+	crewHandler := handlers.NewCrewHandler(crewService)
 
 	newServer := &Server{
-		port:       port,
-		db:         dbService,
-		issService: issService,
-		issHandler: issHandler,
+		port:        port,
+		db:          dbService,
+		issService:  issService,
+		issHandler:  issHandler,
+		crewService: crewService,
+		crewHandler: crewHandler,
 	}
 
 	server := &http.Server{

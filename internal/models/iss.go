@@ -47,11 +47,6 @@ type HistoricalRequest struct {
 	Units     string `json:"units,omitempty"`
 }
 
-type ErrorResponse struct {
-	Error   string `json:"error"`
-	Message string `json:"message"`
-}
-
 func (r *ISSPositionResponse) ToISSPosition() *ISSPosition {
 	return &ISSPosition{
 		Name:       r.Name,

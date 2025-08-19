@@ -38,6 +38,10 @@ func (s *Server) RegisterRoutes() http.Handler {
 		r.Get("/range", s.issHandler.GetPositionsInRange)
 
 		r.Get("/status", s.issHandler.GetISSStatus)
+
+		r.Get("/crew", s.crewHandler.GetCurrentCrew)
+
+		r.Get("/crewWithPhotos", s.crewHandler.GetCurrentCrewWithPhotos)
 	})
 
 	r.Get("/swagger/*", httpSwagger.WrapHandler)
@@ -57,7 +61,7 @@ func (s *Server) HelloWorldHandler(w http.ResponseWriter, r *http.Request) {
 	resp := make(map[string]string)
 	resp["message"] = "Hello World"
 	resp["service"] = "ISS Model Backend"
-	resp["endpoints"] = "/iss/current, /iss/historical/{timestamp}, /iss/range, /iss/status"
+	resp["endpoints"] = "/iss/current, /iss/historical/{timestamp}, /iss/range, /iss/status, /iss/crew"
 
 	jsonResp, err := json.Marshal(resp)
 	if err != nil {

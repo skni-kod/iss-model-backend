@@ -1,4 +1,3 @@
-// internal/handlers/iss_handlers.go
 package handlers
 
 import (
@@ -9,6 +8,7 @@ import (
 
 	"iss-model-backend/internal/models"
 	"iss-model-backend/internal/services"
+	"iss-model-backend/internal/utils"
 
 	"github.com/go-chi/chi/v5"
 )
@@ -41,11 +41,11 @@ func (h *ISSHandler) GetCurrentPosition(w http.ResponseWriter, r *http.Request) 
 
 	position, err := h.issService.GetCurrentPosition(units)
 	if err != nil {
-		h.sendErrorResponse(w, http.StatusInternalServerError, "Failed to get current position", err.Error())
+		utils.SendErrorResponse(w, http.StatusInternalServerError, "Failed to get current position", err.Error())
 		return
 	}
 
-	h.sendJSONResponse(w, http.StatusOK, position)
+	utils.SendJSONResponse(w, http.StatusOK, position)
 }
 
 // GetHistoricalPosition returns ISS position for a specific timestamp
@@ -65,7 +65,7 @@ func (h *ISSHandler) GetHistoricalPosition(w http.ResponseWriter, r *http.Reques
 	timestampStr := chi.URLParam(r, "timestamp")
 	timestamp, err := strconv.ParseInt(timestampStr, 10, 64)
 	if err != nil {
-		h.sendErrorResponse(w, http.StatusBadRequest, "Invalid timestamp", "Timestamp must be a valid Unix timestamp")
+		utils.SendErrorResponse(w, http.StatusBadRequest, "Invalid timestamp", "Timestamp must be a valid Unix timestamp")
 		return
 	}
 
@@ -77,19 +77,19 @@ func (h *ISSHandler) GetHistoricalPosition(w http.ResponseWriter, r *http.Reques
 	position, err := h.issService.GetHistoricalPosition(timestamp, units)
 	if err != nil {
 		if err.Error() == "Timestamp outside set range (4 hours back/forward)" {
-			h.sendErrorResponse(w, http.StatusBadRequest, "Timestamp out of range", err.Error())
+			utils.SendErrorResponse(w, http.StatusBadRequest, "Timestamp out of range", err.Error())
 			return
 		}
-		h.sendErrorResponse(w, http.StatusInternalServerError, "Failed to get historical position", err.Error())
+		utils.SendErrorResponse(w, http.StatusInternalServerError, "Failed to get historical position", err.Error())
 		return
 	}
 
 	if position == nil {
-		h.sendErrorResponse(w, http.StatusNotFound, "Position not found", "No position data found for the specified timestamp")
+		utils.SendErrorResponse(w, http.StatusNotFound, "Position not found", "No position data found for the specified timestamp")
 		return
 	}
 
-	h.sendJSONResponse(w, http.StatusOK, position)
+	utils.SendJSONResponse(w, http.StatusOK, position)
 }
 
 // GetPositionsInRange returns ISS positions within a time range
@@ -110,29 +110,29 @@ func (h *ISSHandler) GetPositionsInRange(w http.ResponseWriter, r *http.Request)
 	endTimeStr := r.URL.Query().Get("end_time")
 
 	if startTimeStr == "" || endTimeStr == "" {
-		h.sendErrorResponse(w, http.StatusBadRequest, "Missing parameters", "Both start_time and end_time are required")
+		utils.SendErrorResponse(w, http.StatusBadRequest, "Missing parameters", "Both start_time and end_time are required")
 		return
 	}
 
 	startTime, err := strconv.ParseInt(startTimeStr, 10, 64)
 	if err != nil {
-		h.sendErrorResponse(w, http.StatusBadRequest, "Invalid start_time", "start_time must be a valid Unix timestamp")
+		utils.SendErrorResponse(w, http.StatusBadRequest, "Invalid start_time", "start_time must be a valid Unix timestamp")
 		return
 	}
 
 	endTime, err := strconv.ParseInt(endTimeStr, 10, 64)
 	if err != nil {
-		h.sendErrorResponse(w, http.StatusBadRequest, "Invalid end_time", "end_time must be a valid Unix timestamp")
+		utils.SendErrorResponse(w, http.StatusBadRequest, "Invalid end_time", "end_time must be a valid Unix timestamp")
 		return
 	}
 
 	if startTime >= endTime {
-		h.sendErrorResponse(w, http.StatusBadRequest, "Invalid time range", "start_time must be less than end_time")
+		utils.SendErrorResponse(w, http.StatusBadRequest, "Invalid time range", "start_time must be less than end_time")
 		return
 	}
 
 	if endTime-startTime > 24*3600 {
-		h.sendErrorResponse(w, http.StatusBadRequest, "Time range too large", "Maximum time range is 24 hours")
+		utils.SendErrorResponse(w, http.StatusBadRequest, "Time range too large", "Maximum time range is 24 hours")
 		return
 	}
 
@@ -143,11 +143,11 @@ func (h *ISSHandler) GetPositionsInRange(w http.ResponseWriter, r *http.Request)
 
 	positions, err := h.issService.GetPositionsInRange(startTime, endTime, units)
 	if err != nil {
-		h.sendErrorResponse(w, http.StatusInternalServerError, "Failed to get positions", err.Error())
+		utils.SendErrorResponse(w, http.StatusInternalServerError, "Failed to get positions", err.Error())
 		return
 	}
 
-	h.sendJSONResponse(w, http.StatusOK, positions)
+	utils.SendJSONResponse(w, http.StatusOK, positions)
 }
 
 // GetISSStatus returns general ISS tracking status and statistics
@@ -162,13 +162,13 @@ func (h *ISSHandler) GetPositionsInRange(w http.ResponseWriter, r *http.Request)
 func (h *ISSHandler) GetISSStatus(w http.ResponseWriter, r *http.Request) {
 	currentPos, err := h.issService.GetCurrentPosition("kilometers")
 	if err != nil {
-		h.sendErrorResponse(w, http.StatusInternalServerError, "Failed to get current position", err.Error())
+		utils.SendErrorResponse(w, http.StatusInternalServerError, "Failed to get current position", err.Error())
 		return
 	}
 
 	stats, err := h.issService.GetStatistics()
 	if err != nil {
-		h.sendErrorResponse(w, http.StatusInternalServerError, "Failed to get statistics", err.Error())
+		utils.SendErrorResponse(w, http.StatusInternalServerError, "Failed to get statistics", err.Error())
 		return
 	}
 
@@ -183,7 +183,7 @@ func (h *ISSHandler) GetISSStatus(w http.ResponseWriter, r *http.Request) {
 		"statistics":          stats,
 	}
 
-	h.sendJSONResponse(w, http.StatusOK, status)
+	utils.SendJSONResponse(w, http.StatusOK, status)
 }
 
 // PostHistoricalRequest handles POST request for historical data with JSON body
@@ -202,12 +202,12 @@ func (h *ISSHandler) PostHistoricalRequest(w http.ResponseWriter, r *http.Reques
 	var req models.HistoricalRequest
 
 	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
-		h.sendErrorResponse(w, http.StatusBadRequest, "Invalid JSON", err.Error())
+		utils.SendErrorResponse(w, http.StatusBadRequest, "Invalid JSON", err.Error())
 		return
 	}
 
 	if req.Timestamp == 0 {
-		h.sendErrorResponse(w, http.StatusBadRequest, "Missing timestamp", "Timestamp is required")
+		utils.SendErrorResponse(w, http.StatusBadRequest, "Missing timestamp", "Timestamp is required")
 		return
 	}
 
@@ -219,38 +219,17 @@ func (h *ISSHandler) PostHistoricalRequest(w http.ResponseWriter, r *http.Reques
 	position, err := h.issService.GetHistoricalPosition(req.Timestamp, units)
 	if err != nil {
 		if err.Error() == "timestamp outside retention window (4 hours back/forward)" {
-			h.sendErrorResponse(w, http.StatusBadRequest, "Timestamp out of range", err.Error())
+			utils.SendErrorResponse(w, http.StatusBadRequest, "Timestamp out of range", err.Error())
 			return
 		}
-		h.sendErrorResponse(w, http.StatusInternalServerError, "Failed to get historical position", err.Error())
+		utils.SendErrorResponse(w, http.StatusInternalServerError, "Failed to get historical position", err.Error())
 		return
 	}
 
 	if position == nil {
-		h.sendErrorResponse(w, http.StatusNotFound, "Position not found", "No position data found for the specified timestamp")
+		utils.SendErrorResponse(w, http.StatusNotFound, "Position not found", "No position data found for the specified timestamp")
 		return
 	}
 
-	h.sendJSONResponse(w, http.StatusOK, position)
-}
-
-func (h *ISSHandler) sendJSONResponse(w http.ResponseWriter, statusCode int, data interface{}) {
-	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(statusCode)
-
-	if err := json.NewEncoder(w).Encode(data); err != nil {
-		http.Error(w, "Failed to encode response", http.StatusInternalServerError)
-	}
-}
-
-func (h *ISSHandler) sendErrorResponse(w http.ResponseWriter, statusCode int, error, message string) {
-	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(statusCode)
-
-	errorResp := models.ErrorResponse{
-		Error:   error,
-		Message: message,
-	}
-
-	json.NewEncoder(w).Encode(errorResp)
+	utils.SendJSONResponse(w, http.StatusOK, position)
 }
