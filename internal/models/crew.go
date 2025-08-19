@@ -19,3 +19,19 @@ type AstronautWithPhoto struct {
 	Name     string `json:"name"`
 	ImageUrl string `json:"imgUrl"`
 }
+
+type NASAImagesResponse struct {
+	Collection struct {
+		Items []struct {
+			Data []struct {
+				Title       string   `json:"title"`
+				Description string   `json:"description"`
+				Keywords    []string `json:"keywords"`
+			} `json:"data"`
+			Links []struct {
+				Href string `json:"href"`
+				Rel  string `json:"rel"`
+			} `json:"links"`
+		} `json:"items"`
+	} `json:"collection"`
+}
