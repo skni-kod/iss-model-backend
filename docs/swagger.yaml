@@ -1,5 +1,33 @@
 basePath: /
 definitions:
+  handlers.CreatePostRequest:
+    properties:
+      content:
+        type: string
+      title:
+        type: string
+    type: object
+  handlers.LoginRequest:
+    properties:
+      password:
+        type: string
+      username:
+        type: string
+    type: object
+  handlers.LoginResponse:
+    properties:
+      token:
+        type: string
+    type: object
+  handlers.RegisterRequest:
+    properties:
+      email:
+        type: string
+      password:
+        type: string
+      username:
+        type: string
+    type: object
   models.Astronaut:
     properties:
       craft:
@@ -81,6 +109,19 @@ definitions:
       visibility:
         type: string
     type: object
+  models.Post:
+    properties:
+      content:
+        type: string
+      created_at:
+        type: string
+      id:
+        type: integer
+      title:
+        type: string
+      updated_at:
+        type: string
+    type: object
 host: localhost:8080
 info:
   contact:
@@ -112,6 +153,156 @@ paths:
       summary: Hello World
       tags:
       - general
+  /admin/blog/posts:
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: Post data
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/handlers.CreatePostRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/models.Post'
+      security:
+      - ApiKeyAuth: []
+      summary: Create New Post
+      tags:
+      - Blog (Admin)
+  /admin/blog/posts/{id}:
+    delete:
+      parameters:
+      - description: Post ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      responses:
+        "204":
+          description: No Content
+      security:
+      - ApiKeyAuth: []
+      summary: Delete Post
+      tags:
+      - Blog (Admin)
+    put:
+      consumes:
+      - application/json
+      parameters:
+      - description: Post ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Post data
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/handlers.CreatePostRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.Post'
+      security:
+      - ApiKeyAuth: []
+      summary: Update Post
+      tags:
+      - Blog (Admin)
+  /admin/login:
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: Admin credentials
+        in: body
+        name: credentials
+        required: true
+        schema:
+          $ref: '#/definitions/handlers.LoginRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/handlers.LoginResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+      summary: Admin Login
+      tags:
+      - Auth
+  /admin/register:
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: Admin credentials
+        in: body
+        name: credentials
+        required: true
+        schema:
+          $ref: '#/definitions/handlers.RegisterRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Register Admin
+      tags:
+      - Auth
+  /blog/posts:
+    get:
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/models.Post'
+            type: array
+      summary: Get All Posts
+      tags:
+      - Blog
+  /blog/posts/{id}:
+    get:
+      parameters:
+      - description: Post ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.Post'
+      summary: Get Post by ID
+      tags:
+      - Blog
   /health:
     get:
       consumes:
@@ -317,4 +508,11 @@ paths:
 schemes:
 - http
 - https
+securityDefinitions:
+  ApiKeyAuth:
+    description: '"Wpisz ''Bearer '' (ze spacją), a następnie swój token JWT. Przykład:
+      ''Bearer eyJhbGciOiJIUzI1Ni...''"'
+    in: header
+    name: Authorization
+    type: apiKey
 swagger: "2.0"

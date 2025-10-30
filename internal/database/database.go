@@ -75,7 +75,7 @@ func New() Service {
 	sqlDB.SetMaxOpenConns(100)
 	sqlDB.SetConnMaxLifetime(time.Hour)
 
-	if err := db.AutoMigrate(&models.ISSPosition{}); err != nil {
+	if err := db.AutoMigrate(&models.ISSPosition{}, &models.Post{}, &models.User{}); err != nil {
 		log.Fatal("Failed to migrate database:", err)
 	}
 

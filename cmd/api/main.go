@@ -13,6 +13,10 @@
 // @host localhost:8080
 // @BasePath /
 // @schemes http https
+// @securityDefinitions.apikey ApiKeyAuth
+// @in header
+// @name Authorization
+// @description "Wpisz 'Bearer ' (ze spacją), a następnie swój token JWT. Przykład: 'Bearer eyJhbGciOiJIUzI1Ni...'"
 package main
 
 import (

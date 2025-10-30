@@ -23,6 +23,10 @@ type Server struct {
 	issHandler  *handlers.ISSHandler
 	crewService *services.CrewService
 	crewHandler *handlers.CrewHandler
+	postService *services.PostService
+	postHandler *handlers.PostHandler
+	authService *services.AuthService
+	authHandler *handlers.AuthHandler
 }
 
 func NewServer() *http.Server {
@@ -35,7 +39,7 @@ func NewServer() *http.Server {
 
 	gormDB := dbService.GetDB()
 
-	err := gormDB.AutoMigrate(&models.ISSPosition{})
+	err := gormDB.AutoMigrate(&models.ISSPosition{}, &models.Post{}, &models.User{})
 	if err != nil {
 		fmt.Printf("Failed to auto-migrate models: %v\n", err)
 	}
@@ -44,6 +48,10 @@ func NewServer() *http.Server {
 	issHandler := handlers.NewISSHandler(issService)
 	crewService := services.NewCrewService()
 	crewHandler := handlers.NewCrewHandler(crewService)
+	postService := services.NewPostService(gormDB)
+	postHandler := handlers.NewPostHandler(postService)
+	authService := services.NewAuthService(gormDB)
+	authHandler := handlers.NewAuthHandler(authService)
 
 	newServer := &Server{
 		port:        port,
@@ -52,6 +60,10 @@ func NewServer() *http.Server {
 		issHandler:  issHandler,
 		crewService: crewService,
 		crewHandler: crewHandler,
+		postService: postService,
+		postHandler: postHandler,
+		authService: authService,
+		authHandler: authHandler,
 	}
 
 	server := &http.Server{

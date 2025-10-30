@@ -44,6 +44,23 @@ func (s *Server) RegisterRoutes() http.Handler {
 		r.Get("/crewWithPhotos", s.crewHandler.GetCurrentCrewWithPhotos)
 	})
 
+	r.Route("/blog", func(r chi.Router) {
+		r.Get("/posts", s.postHandler.HandleGetAllPosts)
+		r.Get("/posts/{id}", s.postHandler.HandleGetPostByID)
+	})
+
+	r.Route("/admin", func(r chi.Router) {
+		r.Post("/login", s.authHandler.HandleLogin)
+		r.Post("/register", s.authHandler.HandleRegister)
+
+		r.Group(func(r chi.Router) {
+			r.Use(s.AuthMiddleware)
+
+			r.Post("/blog/posts", s.postHandler.HandleCreatePost)
+			r.Put("/blog/posts/{id}", s.postHandler.HandleUpdatePost)
+			r.Delete("/blog/posts/{id}", s.postHandler.HandleDeletePost)
+		})
+	})
 	r.Get("/swagger/*", httpSwagger.WrapHandler)
 
 	return r
