@@ -1,13 +1,23 @@
-name: Deploy
+name: Production deploy
+
 on:
   push:
-    branches: [ "main" ]
+    branches: [main]
+
+permissions:
+  contents: read
+  packages: write
 
 jobs:
+  build:
+    uses: ./.github/workflows/build_push.yml
+
   deploy:
+    needs: [build]
+    environment: staging
     runs-on: self-hosted
     steps:
-      - name: Deploy
+      - name: Staging deploy
         uses: appleboy/ssh-action@master
         with:
           host: ${{ secrets.REMOTE_HOST }}
@@ -16,12 +26,8 @@ jobs:
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           script: |
             set -e
-            
-            cd /home/kni/iss-model-backend
-            git stash
-            git checkout main
-            git pull
 
-            docker compose up --build -d
-            
+            cd /home/iss
+
+            docker compose --file docker-compose.stag.yml pull && docker compose --file docker-compose.stag.yml up -d
             docker system prune -a -f
