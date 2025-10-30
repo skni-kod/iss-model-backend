@@ -42,6 +42,10 @@ type ISSPositionResponse struct {
 	Units      string  `json:"units"`
 }
 
+type SolarAngleResponse struct {
+	Angle float64 `json:"angle"`
+}
+
 type HistoricalRequest struct {
 	Timestamp int64  `json:"timestamp" validate:"required"`
 	Units     string `json:"units,omitempty"`

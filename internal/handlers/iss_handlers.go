@@ -233,3 +233,26 @@ func (h *ISSHandler) PostHistoricalRequest(w http.ResponseWriter, r *http.Reques
 
 	utils.SendJSONResponse(w, http.StatusOK, position)
 }
+
+// GetSolarAngle zwraca obliczony kąt azymutu słońca
+// @Summary Get Solar Azimuth Angle
+// @Description Returns the calculated azimuth angle of the sun relative to the ISS (for motor control)
+// @Tags ISS
+// @Accept json
+// @Produce json
+// @Success 200 {object} models.SolarAngleResponse
+// @Failure 500 {object} models.ErrorResponse
+// @Router /iss/solar-angle [get]
+func (h *ISSHandler) GetSolarAngle(w http.ResponseWriter, r *http.Request) {
+	angle, err := h.issService.GetSolarAngle()
+	if err != nil {
+		utils.SendErrorResponse(w, http.StatusInternalServerError, "Failed to calculate solar angle", err.Error())
+		return
+	}
+
+	response := models.SolarAngleResponse{
+		Angle: angle,
+	}
+
+	utils.SendJSONResponse(w, http.StatusOK, response)
+}

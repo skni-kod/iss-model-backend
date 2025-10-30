@@ -42,6 +42,8 @@ func (s *Server) RegisterRoutes() http.Handler {
 		r.Get("/crew", s.crewHandler.GetCurrentCrew)
 
 		r.Get("/crewWithPhotos", s.crewHandler.GetCurrentCrewWithPhotos)
+
+		r.Get("/solar-angle", s.issHandler.GetSolarAngle)
 	})
 
 	r.Route("/blog", func(r chi.Router) {

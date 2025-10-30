@@ -122,6 +122,11 @@ definitions:
       updated_at:
         type: string
     type: object
+  models.SolarAngleResponse:
+    properties:
+      angle:
+        type: number
+    type: object
 host: localhost:8080
 info:
   contact:
@@ -483,6 +488,26 @@ paths:
           schema:
             $ref: '#/definitions/models.ErrorResponse'
       summary: Get ISS Positions in Time Range
+      tags:
+      - ISS
+  /iss/solar-angle:
+    get:
+      consumes:
+      - application/json
+      description: Returns the calculated azimuth angle of the sun relative to the
+        ISS (for motor control)
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.SolarAngleResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+      summary: Get Solar Azimuth Angle
       tags:
       - ISS
   /iss/status:

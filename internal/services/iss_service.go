@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"io"
 	"log"
+	"math"
 	"net/http"
 	"time"
 
@@ -146,6 +147,41 @@ func (s *ISSService) GetStatistics() (map[string]any, error) {
 	}
 
 	return stats, nil
+}
+
+func (s *ISSService) GetSolarAngle() (float64, error) {
+	position, err := s.GetCurrentPosition("kilometers")
+	if err != nil {
+		return 0, fmt.Errorf("failed to get current position for solar angle: %w", err)
+	}
+
+	angle := s.calculateSunAzimuth(
+		position.Latitude,
+		position.Longitude,
+		position.SolarLat,
+		position.SolarLon,
+	)
+
+	return angle, nil
+}
+
+func (s *ISSService) calculateSunAzimuth(issLat, issLon, sunLat, sunLon float64) float64 {
+	issLatRad := issLat * math.Pi / 180
+	issLonRad := issLon * math.Pi / 180
+	sunLatRad := sunLat * math.Pi / 180
+	sunLonRad := sunLon * math.Pi / 180
+
+	deltaLonRad := sunLonRad - issLonRad
+
+	y := math.Sin(deltaLonRad) * math.Cos(sunLatRad)
+	x := math.Cos(issLatRad)*math.Sin(sunLatRad) -
+		math.Sin(issLatRad)*math.Cos(sunLatRad)*math.Cos(deltaLonRad)
+
+	bearingRad := math.Atan2(y, x)
+
+	bearingDeg := math.Mod((bearingRad*180/math.Pi)+360, 360)
+
+	return bearingDeg
 }
 
 func (s *ISSService) fetchFromAPI(timestamp int64, units string) (*models.ISSPosition, error) {

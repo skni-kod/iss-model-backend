@@ -561,6 +561,35 @@ const docTemplate = `{
                 }
             }
         },
+        "/iss/solar-angle": {
+            "get": {
+                "description": "Returns the calculated azimuth angle of the sun relative to the ISS (for motor control)",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "ISS"
+                ],
+                "summary": "Get Solar Azimuth Angle",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/models.SolarAngleResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
         "/iss/status": {
             "get": {
                 "description": "Returns statistics about ISS tracking data and system status",
@@ -779,6 +808,14 @@ const docTemplate = `{
                 },
                 "updated_at": {
                     "type": "string"
+                }
+            }
+        },
+        "models.SolarAngleResponse": {
+            "type": "object",
+            "properties": {
+                "angle": {
+                    "type": "number"
                 }
             }
         }
