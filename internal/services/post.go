@@ -14,11 +14,30 @@ func NewPostService(db *gorm.DB) *PostService {
 	return &PostService{db: db}
 }
 
-func (s *PostService) CreatePost(title, content string) (*models.Post, error) {
-	post := &models.Post{
-		Title:   title,
-		Content: content,
+func (s *PostService) CreatePost(
+	title, content, excerpt, author, publishDate, readTime, image string,
+	images, tags []string,
+) (*models.Post, error) {
+	// Ensure arrays are not nil
+	if images == nil {
+		images = []string{}
 	}
+	if tags == nil {
+		tags = []string{}
+	}
+
+	post := &models.Post{
+		Title:       title,
+		Content:     content,
+		Excerpt:     excerpt,
+		Author:      author,
+		PublishDate: publishDate,
+		ReadTime:    readTime,
+		Image:       image,
+		Images:      images,
+		Tags:        tags,
+	}
+
 	if err := s.db.Create(post).Error; err != nil {
 		return nil, err
 	}
@@ -41,14 +60,33 @@ func (s *PostService) GetAllPosts() ([]models.Post, error) {
 	return posts, nil
 }
 
-func (s *PostService) UpdatePost(id uint, title, content string) (*models.Post, error) {
+func (s *PostService) UpdatePost(
+	id uint,
+	title, content, excerpt, author, publishDate, readTime, image string,
+	images, tags []string,
+) (*models.Post, error) {
 	post, err := s.GetPostByID(id)
 	if err != nil {
 		return nil, err
 	}
 
+	// Ensure arrays are not nil
+	if images == nil {
+		images = []string{}
+	}
+	if tags == nil {
+		tags = []string{}
+	}
+
 	post.Title = title
 	post.Content = content
+	post.Excerpt = excerpt
+	post.Author = author
+	post.PublishDate = publishDate
+	post.ReadTime = readTime
+	post.Image = image
+	post.Images = images
+	post.Tags = tags
 
 	if err := s.db.Save(post).Error; err != nil {
 		return nil, err
