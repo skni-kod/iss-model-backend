@@ -51,7 +51,6 @@ func (h *PostHandler) HandleGetPostByID(w http.ResponseWriter, r *http.Request) 
 
 	post, err := h.postService.GetPostByID(uint(id))
 	if err != nil {
-		// Obsługa błędu "nie znaleziono"
 		utils.SendErrorResponse(w, http.StatusNotFound, "Post not found", err.Error())
 		return
 	}
@@ -59,8 +58,15 @@ func (h *PostHandler) HandleGetPostByID(w http.ResponseWriter, r *http.Request) 
 }
 
 type CreatePostRequest struct {
-	Title   string `json:"title"`
-	Content string `json:"content"`
+	Title       string   `json:"title"`
+	Content     string   `json:"content"`
+	Excerpt     string   `json:"excerpt"`
+	Author      string   `json:"author"`
+	PublishDate string   `json:"publishDate"`
+	ReadTime    string   `json:"readTime"`
+	Image       string   `json:"image"`
+	Images      []string `json:"images"`
+	Tags        []string `json:"tags"`
 }
 
 // @Summary Create New Post
@@ -78,7 +84,17 @@ func (h *PostHandler) HandleCreatePost(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	post, err := h.postService.CreatePost(req.Title, req.Content)
+	post, err := h.postService.CreatePost(
+		req.Title,
+		req.Content,
+		req.Excerpt,
+		req.Author,
+		req.PublishDate,
+		req.ReadTime,
+		req.Image,
+		req.Images,
+		req.Tags,
+	)
 	if err != nil {
 		utils.SendErrorResponse(w, http.StatusInternalServerError, "Failed to create post", err.Error())
 		return
@@ -109,7 +125,18 @@ func (h *PostHandler) HandleUpdatePost(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	post, err := h.postService.UpdatePost(uint(id), req.Title, req.Content)
+	post, err := h.postService.UpdatePost(
+		uint(id),
+		req.Title,
+		req.Content,
+		req.Excerpt,
+		req.Author,
+		req.PublishDate,
+		req.ReadTime,
+		req.Image,
+		req.Images,
+		req.Tags,
+	)
 	if err != nil {
 		utils.SendErrorResponse(w, http.StatusInternalServerError, "Failed to update post", err.Error())
 		return

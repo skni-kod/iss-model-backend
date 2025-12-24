@@ -73,7 +73,7 @@ func (s *CrewService) GetCurrentCrewWithPhotos() (*models.ISSCrewWithPhotosRespo
 	for _, astronaut := range crew.People {
 		photoURL, err := s.GetNASAAstronautPortrait(astronaut.Name)
 		if err != nil {
-			fmt.Errorf("failed to find correspondig image")
+			return nil, fmt.Errorf("failed to find correspondig image")
 		}
 
 		crewWithPhotos = append(crewWithPhotos, models.AstronautWithPhoto{
