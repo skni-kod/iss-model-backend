@@ -625,8 +625,35 @@ const docTemplate = `{
         "handlers.CreatePostRequest": {
             "type": "object",
             "properties": {
+                "author": {
+                    "type": "string"
+                },
                 "content": {
                     "type": "string"
+                },
+                "excerpt": {
+                    "type": "string"
+                },
+                "image": {
+                    "type": "string"
+                },
+                "images": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "publishDate": {
+                    "type": "string"
+                },
+                "readTime": {
+                    "type": "string"
+                },
+                "tags": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
                 },
                 "title": {
                     "type": "string"
@@ -794,14 +821,41 @@ const docTemplate = `{
         "models.Post": {
             "type": "object",
             "properties": {
+                "author": {
+                    "type": "string"
+                },
                 "content": {
                     "type": "string"
                 },
                 "created_at": {
                     "type": "string"
                 },
+                "excerpt": {
+                    "type": "string"
+                },
                 "id": {
                     "type": "integer"
+                },
+                "image": {
+                    "type": "string"
+                },
+                "images": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "publishDate": {
+                    "type": "string"
+                },
+                "readTime": {
+                    "type": "string"
+                },
+                "tags": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
                 },
                 "title": {
                     "type": "string"

@@ -31,9 +31,13 @@ services:
     ports:
       - "5445:${BLUEPRINT_DB_PORT}"
     volumes:
-      - psql_volume_bp:/var/lib/postgresql/data
+      - psql_volume_bp:/var/lib/postgresql
     healthcheck:
-      test: ["CMD-SHELL", "sh -c 'pg_isready -U ${BLUEPRINT_DB_USERNAME} -d ${BLUEPRINT_DB_DATABASE}'"]
+      test:
+        [
+          "CMD-SHELL",
+          "sh -c 'pg_isready -U ${BLUEPRINT_DB_USERNAME} -d ${BLUEPRINT_DB_DATABASE}'",
+        ]
       interval: 5s
       timeout: 5s
       retries: 3

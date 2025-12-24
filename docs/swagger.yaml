@@ -2,8 +2,26 @@ basePath: /
 definitions:
   handlers.CreatePostRequest:
     properties:
+      author:
+        type: string
       content:
         type: string
+      excerpt:
+        type: string
+      image:
+        type: string
+      images:
+        items:
+          type: string
+        type: array
+      publishDate:
+        type: string
+      readTime:
+        type: string
+      tags:
+        items:
+          type: string
+        type: array
       title:
         type: string
     type: object
@@ -111,12 +129,30 @@ definitions:
     type: object
   models.Post:
     properties:
+      author:
+        type: string
       content:
         type: string
       created_at:
         type: string
+      excerpt:
+        type: string
       id:
         type: integer
+      image:
+        type: string
+      images:
+        items:
+          type: string
+        type: array
+      publishDate:
+        type: string
+      readTime:
+        type: string
+      tags:
+        items:
+          type: string
+        type: array
       title:
         type: string
       updated_at:
